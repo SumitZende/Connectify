@@ -6,8 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/',[HomeController::class,'index'])->middleware(['auth', 'verified'])->name('Home');
-
+Route::get('/',[HomeController::class,'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
