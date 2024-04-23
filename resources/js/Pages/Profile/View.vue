@@ -80,7 +80,7 @@ function  SubmitCoverImage(){
         <img :src=" coverImageSrc ||user.cover_url|| '/img/default_cover_image.jpg'"
              class="w-full  h-[200px] object-cover"  alt=""/>
         <div class="absolute top-2 right-2">
-<!--        upload image button-->
+          <!-- upload image button-->
           <button class="flex bg-gray-50 hover:bg-gray-200  text-gray-800 px-2 py-1
                       text-xs items-center opacity-0 group-hover:opacity-100 cursor-pointer rounded"
                     v-if="!coverImageSrc">
