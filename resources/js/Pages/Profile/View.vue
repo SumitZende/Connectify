@@ -6,7 +6,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import {CameraIcon , XMarkIcon, PencilSquareIcon ,ArrowUpTrayIcon} from '@heroicons/vue/24/solid'
+import {CameraIcon , XMarkIcon, PencilSquareIcon ,ArrowUpTrayIcon,CheckCircleIcon} from '@heroicons/vue/24/solid'
 import { useForm } from '@inertiajs/vue3'
 
 const imageForm = useForm({
@@ -16,6 +16,7 @@ const imageForm = useForm({
 
 const  showNotification =ref('true')
 const  coverImageSrc = ref('')
+const  avatarImageSrc = ref('')
 const  isMyProfile = computed(()=>authUser && authUser.id === props.user.id);
 const authUser = usePage().props.auth.user;
 const  props= defineProps({
@@ -26,11 +27,14 @@ const  props= defineProps({
   status: {
     type: String,
   },
+  success: {
+    type: String,
+  },
   user:{
     type:Object
   }
 });
-
+//cover-image action
 function onCoverChange(event){
   imageForm.cover = event.target.files[0]
   if(imageForm.cover){
@@ -47,7 +51,7 @@ function CancelCoverImage(){
   coverImageSrc.value = null;
 }
 function  SubmitCoverImage(){
-  imageForm.post(route('profile.updateCover'),{
+  imageForm.post(route('profile.updateImages'),{
     onSuccess:(user)=>{
       CancelCoverImage()
       setTimeout(()=>{
@@ -57,15 +61,41 @@ function  SubmitCoverImage(){
   })
 }
 
+//avatar action
+function onAvatarChange(event){
+  imageForm.avatar = event.target.files[0]
+  if(imageForm.avatar){
+    const reader = new FileReader()
+    reader.onload=()=>{
+
+      avatarImageSrc.value = reader.result;
+    }
+    reader.readAsDataURL(imageForm.avatar)
+  }
+}
+function CancelAvatarImage(){
+  imageForm.avatar = null;
+  avatarImageSrc.value = null;
+}
+function  SubmitAvatarImage(){
+  imageForm.post(route('profile.updateImages'),{
+    onSuccess:(user)=>{
+      CancelAvatarImage()
+      setTimeout(()=>{
+        showNotification.value = false
+      },3000)
+    },
+  })
+}
 </script>
 <template>
   <AuthenticatedLayout>
     <div class="max-w-[768px] mx-auto  h-full overflow-auto ">
 <!--      success message-->
       <div
-          v-show="showNotification && status === 'cover image updated'"
+          v-show="showNotification && success "
           class="my-2  py-2 px-3 font-medium text-sm bg-emerald-600 text-white">
-        Cover Image Updated Successfully !!
+          {{success}}
       </div>
 <!--      error message-->
       <div
@@ -75,23 +105,22 @@ function  SubmitCoverImage(){
         {{errors.cover}}
       </div>
       <!--    cover image-->
-      <div class="group relative bg-white">
-
+      <div class="group/cover relative bg-white">
         <img :src=" coverImageSrc ||user.cover_url|| '/img/default_cover_image.jpg'"
              class="w-full  h-[200px] object-cover"  alt=""/>
         <div class="absolute top-2 right-2">
           <!-- upload image button-->
           <button class="flex bg-gray-50 hover:bg-gray-200  text-gray-800 px-2 py-1
-                      text-xs items-center opacity-0 group-hover:opacity-100 cursor-pointer rounded"
+                      text-xs items-center opacity-0 group-hover/cover:opacity-100 cursor-pointer rounded"
                     v-if="!coverImageSrc">
 
             <camera-icon  fill="none" class="w-4 h-4 mr-2"/>
             upload cover image
             <input type="file"
-                   class="absolute left-0 top-0 right-0 opacity-0"
+                   class="absolute left-0 top-0 right-0 opacity-0 cursor-pointer"
                    @change="onCoverChange"/>
           </button>
-          <div v-else class="flex gap-2 opacity-0 group-hover:opacity-100">
+          <div v-else class="flex gap-2 opacity-0 group-hover/cover:opacity-100">
             <!--          cancel-image-->
             <button class=" flex  bg-gray-50 hover:bg-gray-200  text-gray-800 px-2 py-1
                       text-xs items-center  cursor-pointer rounded"
@@ -111,10 +140,45 @@ function  SubmitCoverImage(){
         </div>
 
         <!--      Avatar image-->
-
         <div class="flex">
-          <img src="https://cdn.iconscout.com/icon/free/png-256/free-avatar-370-456322.png?f=webp"
-               class=" ml-[48px] w-[128px] h-[128px] -mt-[64px]"/>
+          <div class="relative group/avatar
+                      flex justify-center items-center
+                      -mt-[64px] ml-[48px]  w-[128px] h-[128px]
+                       rounded-full ">
+            <img :src=" avatarImageSrc || user.avatar_url || '/img/default_avatar.webp'"
+                 class="w-full h-full object-cover rounded-full" alt=""/>
+              <!-- upload image button-->
+              <button class="absolute top-0 left-0 bottom-0 right-0
+                              flex justify-center items-center
+                              bg-black/50  text-gray-300 rounded-full
+                              opacity-0 group-hover/avatar:opacity-100 "
+                      v-if="!avatarImageSrc">
+
+                <camera-icon  fill="none" class="w-8 h-8"/>
+                <input type="file"
+                       class="absolute top-0 left-0 bottom-0 right-0
+                              flex justify-center items-center
+                             rounded-full opacity-0 cursor-pointer"
+                       @change="onAvatarChange"/>
+              </button>
+              <div v-else class="absolute top-1 right-0 flex gap-2 flex-col">
+                <!--          cancel-image-->
+                <button class="w-7 h-7 flex items-center justify-center bg-red-500/80
+                                text-white rounded-full"
+                        @click="CancelAvatarImage">
+                  <XMarkIcon fill="none" class="w-5 h-5 "/>
+
+                </button>
+                <!--            submit button-->
+                <button class="w-7 h-7 flex items-center justify-center bg-emerald-500/80
+                                text-white rounded-full"
+                        @click="SubmitAvatarImage">
+                  <CheckCircleIcon  fill="none" class="w-6 h-6 "/>
+
+
+                </button>
+              </div>
+          </div>
           <div class="flex justify-between items-center flex-1 p-4">
             <h2 class="font-bold text-lg ">{{user.name}}</h2>
             <PrimaryButton v-if="isMyProfile">
@@ -124,6 +188,7 @@ function  SubmitCoverImage(){
         </div>
       </div>
       <div class="border-t-2">
+<!--      tab option-->
         <div>
           <TabGroup>
             <TabList class=" flex bg-white">
@@ -142,9 +207,8 @@ function  SubmitCoverImage(){
               <Tab v-slot="{ selected }" as="template" >
                 <TabItem text="Photos"  :selected="selected"/>
               </Tab>
-
             </TabList>
-
+<!--            tab-content-->
             <TabPanels class="mt-2">
               <TabPanel  v-if="isMyProfile" >
                 <Edit  :must-verify-email="mustVerifyEmail" :status="status"/>
