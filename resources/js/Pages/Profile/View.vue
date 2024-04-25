@@ -99,10 +99,10 @@ function  SubmitAvatarImage(){
       </div>
 <!--      error message-->
       <div
-          v-if="errors.cover"
+          v-if="errors.cover || errors.avatar"
           class="my-2  py-2 px-3 font-medium text-sm bg-red-400 text-white"
       >
-        {{errors.cover}}
+        {{errors.cover || errors.avatar}}
       </div>
       <!--    cover image-->
       <div class="group/cover relative bg-white">
@@ -181,9 +181,6 @@ function  SubmitAvatarImage(){
           </div>
           <div class="flex justify-between items-center flex-1 p-4">
             <h2 class="font-bold text-lg ">{{user.name}}</h2>
-            <PrimaryButton v-if="isMyProfile">
-             <PencilSquareIcon class="w-4 h-4"/>
-            </PrimaryButton>
           </div>
         </div>
       </div>
@@ -192,9 +189,7 @@ function  SubmitAvatarImage(){
         <div>
           <TabGroup>
             <TabList class=" flex bg-white">
-              <Tab  v-if="isMyProfile" v-slot="{ selected }" as="template" >
-                <TabItem text="About"  :selected="selected"/>
-              </Tab>
+
               <Tab v-slot="{ selected }" as="template" >
                 <TabItem text="Posts"  :selected="selected"/>
               </Tab>
@@ -207,12 +202,13 @@ function  SubmitAvatarImage(){
               <Tab v-slot="{ selected }" as="template" >
                 <TabItem text="Photos"  :selected="selected"/>
               </Tab>
+              <Tab  v-if="isMyProfile" v-slot="{ selected }" as="template" >
+                <TabItem text="My Profile"  :selected="selected"/>
+              </Tab>
             </TabList>
 <!--            tab-content-->
             <TabPanels class="mt-2">
-              <TabPanel  v-if="isMyProfile" >
-                <Edit  :must-verify-email="mustVerifyEmail" :status="status"/>
-              </TabPanel>
+
               <TabPanel  class="bg-white p-3 shadow">
                 Post Content
               </TabPanel>
@@ -224,6 +220,9 @@ function  SubmitAvatarImage(){
               </TabPanel>
               <TabPanel  class="bg-white p-3 shadow">
                 Photos
+              </TabPanel>
+              <TabPanel  v-if="isMyProfile" >
+                <Edit  :must-verify-email="mustVerifyEmail" :status="status"/>
               </TabPanel>
             </TabPanels>
           </TabGroup>
