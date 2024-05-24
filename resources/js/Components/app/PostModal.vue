@@ -42,9 +42,10 @@
                 </DialogTitle>
                 <div class="p-3 ">
                   <UserIPostHeader :post="post" :time="false" class="mb-4"/>
-                    <InputTextArea class="mb-3 w-full"
-                                   v-model="form.body"
-                    />
+                  <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
+<!--                    <InputTextArea class="mb-3 w-full"-->
+<!--                                   v-model="form.body"-->
+<!--                    />-->
 
                 </div>
 
@@ -58,6 +59,7 @@
                                     @click="submit">
 
                    submit
+
                   </button>
                 </div>
               </DialogPanel>
@@ -85,10 +87,18 @@ import InputTextArea from "@/Components/app/InputTextArea.vue";
 import UserIPostHeader from "@/Components/app/UserIPostHeader.vue";
 import { XMarkIcon} from '@heroicons/vue/24/solid'
 import {useForm} from "@inertiajs/vue3";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 
 
 const emit = defineEmits(['update:modelValue'])
+
+const editor= ClassicEditor;
+const editorConfig ={
+   toolbar:[ 'heading', '|','bold', 'italic', 'link', '|','bulletedList', 'numberedList',
+     'blockQuote', '|','indent', 'outdent'],
+
+}
 
 const props = defineProps({
   post:{
