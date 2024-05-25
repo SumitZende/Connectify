@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use http\Message\Body;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
@@ -22,13 +23,17 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body'=>['nullable','string','required'],
+            'body'=>['nullable','string'],
             'user_id'=>['numeric']
         ];
     }
 
     protected function prepareForValidation()
     {
-        $this->merge(['user_id'=> auth()->user()->id]);
+        $this->merge([
+            'user_id'=> auth()->user()->id,
+            'body' => $this->input('body') ?: ''
+            ]);
+
     }
 }
