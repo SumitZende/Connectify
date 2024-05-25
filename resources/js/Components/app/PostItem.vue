@@ -6,16 +6,13 @@ import { PencilIcon,TrashIcon , EllipsisVerticalIcon} from '@heroicons/vue/20/so
 import {ref} from "vue";
 import UserIPostHeader from "@/Components/app/UserIPostHeader.vue";
 import {router} from "@inertiajs/vue3";
-
+import {isImage} from '@/healpers.js'
 
 const emit = defineEmits(['editClick'])
 const props=defineProps({
   post:Object
 })
-function isImage(attachement){
-  const  mime=attachement.mime.split('/')
-  return mime[0].toLowerCase()==='image'
-}
+
 
 function  openEditModel(){
   emit('editClick',props.post)
