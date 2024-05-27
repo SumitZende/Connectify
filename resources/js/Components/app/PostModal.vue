@@ -45,11 +45,11 @@ const props = defineProps({
 
 const form =useForm({
   id:null,
-  body :''
+  body :'',
+  attachments:[]
 })
 
 watch(()=> props.post, ()=>{
-  console.log('channged',props.post)
   form.id=props.post.id
   form.body = props.post.body
 })
@@ -66,12 +66,12 @@ function closeModal() {
 }
 
 function submit(){
+  form.attachments = attachmentFiles.value.map(myFile => myFile.file)
   if(form.id){
     form.put(route('post.update',props.post.id),{
       preserveScroll : true,
       onSuccess:()=>{
         closeModal()
-        form.reset()
       }
     })
   }
@@ -80,7 +80,6 @@ function submit(){
       preserveScroll : true,
       onSuccess:()=>{
         closeModal()
-        form.reset()
       }
     })
   }
@@ -165,7 +164,9 @@ function  removeFile(myFile){
                   <UserIPostHeader :post="post" :time="false" class="mb-4"/>
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
 
-                  <div class="grid grid-cols-2 lg:grid-cols-3  gap-3 my-5">
+                  <div class="grid gap-3 my-5" :class="[
+                      attachmentFiles.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
+                  ]">
                     <template v-for="myFile of attachmentFiles">
                       <div
                           class=" group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative ">
@@ -178,7 +179,7 @@ function  removeFile(myFile){
                         </button>
                         <img  v-if="isImage(myFile.file)"
                               :src="myFile.url"
-                              class="object-cover aspect-square"
+                              class="object-contain aspect-square"
                               alt=""/>
                         <template v-else>
                           <document-icon class="w-12 h-12"/>

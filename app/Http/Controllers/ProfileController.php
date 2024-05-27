@@ -83,7 +83,7 @@ class ProfileController extends Controller
             if($user->cover_path){
                 Storage::disk('public')->delete($user->cover_path);
             }
-            $path =$cover->store('userCover-'.$user->id,'public');
+            $path =$cover->store('user-'.$user->id,'public');
             $user->update(['cover_path' => $path]);
             $success="Cover Image Updated Successfully !!";
         }
@@ -91,7 +91,7 @@ class ProfileController extends Controller
             if($user->avatar_path){
                 Storage::disk('public')->delete($user->avatar_path);
             }
-            $path =$avatar->store('userAvatar-'.$user->id,'public');
+            $path =$avatar->store('user-'.$user->id,'public');
             $user->update(['avatar_path' => $path]);
             $success="Avatar Updated Successfully !!";
         }
