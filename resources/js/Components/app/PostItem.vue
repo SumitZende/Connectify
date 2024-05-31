@@ -56,7 +56,7 @@ function  deletePost(){
                   leave-to-class="transform scale-95 opacity-0"
               >
                 <MenuItems
-                    class="absolute right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md
+                    class="absolute z-10 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md
                     bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                 >
 <!--                  edit menu option-->
@@ -131,7 +131,7 @@ function  deletePost(){
             class=" group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative ">
           <div class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white
                                     flex items-center justify-center text-2xl"
-               v-if="ind === 3">
+               v-if="ind === 3 && post.attachement.length > 4">
             +{{post.attachement.length - ind}}more
 
           </div>
