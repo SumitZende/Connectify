@@ -118,4 +118,11 @@ class PostController extends Controller
         $post->delete();
         return  back();
     }
+
+    public  function  downloadAttachment(PostAttachment $attachment)
+    {
+        //TODO check if user has permission to download
+        return response()->download(Storage::disk('public')->path($attachment->path),$attachment->name);
+
+    }
 }
