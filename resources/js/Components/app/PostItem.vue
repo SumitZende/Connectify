@@ -9,7 +9,7 @@ import UserIPostHeader from "@/Components/app/UserIPostHeader.vue";
 import {router} from "@inertiajs/vue3";
 import {isImage} from '@/healpers.js'
 
-const emit = defineEmits(['editClick'])
+const emit = defineEmits(['editClick','attachmentClick'])
 const props=defineProps({
   post:Object
 })
@@ -24,6 +24,10 @@ function  deletePost(){
       preserveScroll : true,
     })
   }
+}
+
+function openAttachment(ind){
+  emit("attachmentClick",props.post, ind )
 }
 </script>
 
@@ -127,8 +131,9 @@ function  deletePost(){
     ]" >
 
       <template v-for="(attachement,ind) of post.attachement.slice(0,4)">
-        <div
-            class=" group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative ">
+        <div  @click="openAttachment(ind)"
+            class=" group aspect-square bg-blue-100 flex flex-col items-center justify-center
+            text-gray-500 relative cursor-pointer">
           <div class="absolute left-0 top-0 right-0 bottom-0 z-10 bg-black/60 text-white
                                     flex items-center justify-center text-2xl"
                v-if="ind === 3 && post.attachement.length > 4">
@@ -138,7 +143,7 @@ function  deletePost(){
           <!--  download button-->
           <a :href="route('post.download',attachement)"
              class=" z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100
-                        bg-gray-600 rounded absolute right-1 top-2 cursor-pointer hover:bg-gray-800">
+                        bg-gray-600 rounded absolute right-1 top-2  hover:bg-gray-800">
             <arrow-down-tray-icon  class="w-4 h-4 "/>
           </a>
         <!--  /download button/ -->
@@ -146,10 +151,10 @@ function  deletePost(){
                 :src="attachement.url"
                 class="object-contain aspect-square"
            alt=""/>
-          <template v-else>
+          <div v-else class="flex flex-col justify-center items-center">
            <DocumentTextIcon  class="w-12 h-12 "/>
             <small>{{attachement.name}}</small>
-          </template>
+          </div>
         </div>
       </template>
     </div>
