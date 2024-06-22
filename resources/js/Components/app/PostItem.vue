@@ -4,7 +4,7 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { PencilIcon,TrashIcon , EllipsisVerticalIcon ,HandThumbUpIcon,ChatBubbleBottomCenterTextIcon,DocumentTextIcon,
          ArrowDownTrayIcon } from '@heroicons/vue/20/solid'
 
-import {ref} from "vue";
+
 import UserIPostHeader from "@/Components/app/UserIPostHeader.vue";
 import {router} from "@inertiajs/vue3";
 import {isImage} from '@/healpers.js'
