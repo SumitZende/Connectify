@@ -11,11 +11,11 @@ import {
 import {computed, ref, watch} from "vue";
 
 import UserIPostHeader from "@/Components/app/UserIPostHeader.vue";
-import { XMarkIcon,PaperClipIcon, BookmarkIcon, DocumentIcon,ArrowUturnLeftIcon} from '@heroicons/vue/24/solid'
-import {useForm} from "@inertiajs/vue3";
+import { XMarkIcon,PaperClipIcon, BookmarkIcon, DocumentIcon,ArrowUturnLeftIcon} from '@heroicons/vue/24/solid';
+import { ExclamationTriangleIcon} from '@heroicons/vue/24/outline'
+import {useForm, usePage} from "@inertiajs/vue3";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import {isImage} from "@/healpers.js";
-
 
 /**
 
@@ -25,7 +25,10 @@ import {isImage} from "@/healpers.js";
  * }
  * @type {Ref<UnwrapRef<*[]>>}
  */
-const attachmentFiles =ref([])
+const  attachmentExtensions = usePage().props.attachmentExtensions;
+const attachmentFiles =ref([]);
+const attachmentErrors =ref([]);
+const  showExtensionText =ref('false');
 const emit = defineEmits(['update:modelValue','hide'])
 
 const editor= ClassicEditor;
@@ -52,7 +55,7 @@ const form =useForm({
 })
 
 watch(()=> props.post, ()=>{
-  console.log('this is triggered')
+
     form.body = props.post.body || ''
 })
 
@@ -73,7 +76,22 @@ function closeModal() {
 function  resetModal(){
   form.reset()
   attachmentFiles.value=[]
+  showExtensionText.value=false
+  attachmentErrors.value =[]
+  if( props.post.attachement){
   props.post.attachement.forEach(file=>file.deleted=false)
+  }
+}
+
+function  processAttachmentError(errors){
+  for(const key in errors){
+    if(key.includes('.')){
+      const[, index]=key.split('.')
+      attachmentErrors.value[index]=errors[key]
+    }
+  }
+
+
 }
 function submit(){
   form.attachments = attachmentFiles.value.map(myFile => myFile.file)
@@ -83,6 +101,9 @@ function submit(){
       preserveScroll : true,
       onSuccess:()=>{
         closeModal()
+      },
+      onError:(errors)=>{
+        processAttachmentError(errors);
       }
     })
   }
@@ -91,14 +112,23 @@ function submit(){
       preserveScroll : true,
       onSuccess:()=>{
         closeModal()
+      },
+      onError:(errors)=>{
+        processAttachmentError(errors);
       }
     })
   }
 
 }
 async function  onAttachmentChoose($event){
-  console.log($event.target.files)
+ showExtensionText.value =false;
   for (const file of $event.target.files){
+    let lastPart=file.name.split('.')
+    let ext = lastPart.pop().toLowerCase()
+
+    if(!attachmentExtensions.includes(ext)){
+      showExtensionText.value=true;
+    }
     const  myFile = {
       file,
       url:await readFile(file)
@@ -106,7 +136,7 @@ async function  onAttachmentChoose($event){
     attachmentFiles.value.push(myFile)
   }
   $event.target.value = null;
-  console.log(attachmentFiles.value)
+
 }
 
 async function readFile(file){
@@ -136,6 +166,9 @@ function  undoDelete(myFile){
   myFile.deleted=false
   form.deleted_file_ids= form.deleted_file_ids.filter(id=>myFile.id !== id)
 }
+// window.onbeforeunload = function() {
+//   resetModal();
+// };
 </script>
 
 <template>
@@ -184,17 +217,28 @@ function  undoDelete(myFile){
                 <div class="p-3 ">
                   <UserIPostHeader :post="post" :time="false" class="mb-4"/>
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
-
+                  <div  v-if="showExtensionText" class="border-l-4 border-amber-500 py-2 px-3
+                              bg-amber-100 mt-3 text-gray-800  ">
+                    <div class="flex items-center gap-2">
+                      <ExclamationTriangleIcon class="w-5 h-5 text-amber-700"/>
+                      Files must be one of the following extensions:<br></div>
+                    <small>{{attachmentExtensions.join(', ')}}</small>
+                  </div>
 
                   <div class="grid gap-3 my-5" :class="[
                       computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
                   ]">
 
-                    <template v-for="myFile of computedAttachments">
+                    <div v-for="(myFile,ind) of computedAttachments">
                       <div
-                          class=" group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative ">
+                          class=" group aspect-square bg-blue-100
+                                flex flex-col items-center justify-center
+                                text-gray-500 relative
+                                 border"
+                          :class="attachmentErrors[ind] ? 'border-red-500':''">
                         <div v-if="myFile.deleted"
-                             class="absolute left-0 bottom-0 right-0  z-10 py-2 px-3 text-sm bg-black text-white flex items-center justify-between cursor-pointer">
+                             class="absolute left-0 bottom-0 right-0  z-10 py-2 px-3 text-sm bg-black text-white
+                             flex items-center justify-between cursor-pointer">
                           To be deleted
                           <ArrowUturnLeftIcon  @click="undoDelete(myFile)" class="h-4 w-4"/>
                         </div>
@@ -217,7 +261,8 @@ function  undoDelete(myFile){
                           <small class="text-center">{{(myFile.file || myFile).name}}</small>
                         </div>
                       </div>
-                    </template>
+                      <small class="text-red-500">{{attachmentErrors[ind]}}</small>
+                    </div>
                   </div>
 
                 </div>

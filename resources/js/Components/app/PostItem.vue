@@ -60,7 +60,7 @@ function openAttachment(ind){
                   leave-to-class="transform scale-95 opacity-0"
               >
                 <MenuItems
-                    class="absolute z-10 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md
+                    class="absolute z-20 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md
                     bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
                 >
 <!--                  edit menu option-->
@@ -142,8 +142,10 @@ function openAttachment(ind){
           </div>
           <!--  download button-->
           <a :href="route('post.download',attachement)"
-             class=" z-20 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100
-                        bg-gray-600 rounded absolute right-1 top-2  hover:bg-gray-800">
+             class=" z-10 opacity-0 group-hover:opacity-100 transition-all w-8 h-8 flex items-center justify-center text-gray-100
+                        bg-gray-600 rounded absolute right-1 top-2  hover:bg-gray-800"
+             @click.stop
+          >
             <arrow-down-tray-icon  class="w-4 h-4 "/>
           </a>
         <!--  /download button/ -->

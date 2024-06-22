@@ -3,11 +3,19 @@
 namespace App\Http\Requests;
 
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
 class StorePostRequest extends FormRequest
 {
+    public  static array $extensions=[
+                    'jpg','jpeg','png','gif','webp','img','svg','jfif',
+                    'mp3','wav','mp4',
+                    'doc','docx','pdf','csv','xls','xlsx',
+                    'ppt','pptx',
+                    'zip'
+                ];
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -19,7 +27,7 @@ class StorePostRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -28,12 +36,7 @@ class StorePostRequest extends FormRequest
             'attachments' => 'array|max:10',
             'attachments.*'=>[
                 'file',
-                File::types([
-                    'jpg','jpeg','png','gif','webp','img',
-                    'mp3','wav','mp4',
-                    'doc','docx','pdf','csv','xls','xlsx',
-                    'zip'
-                ])->max(500 * 1024 *1024)
+                File::types(self::$extensions)
             ],
             'user_id'=>['numeric'],
         ];
@@ -47,4 +50,13 @@ class StorePostRequest extends FormRequest
             ]);
 
     }
+
+    public  function  messages()
+    {
+
+        return[
+            'attachments.*'=>'Invalid extension'
+        ];
+    }
+
 }
